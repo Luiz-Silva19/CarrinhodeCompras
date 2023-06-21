@@ -1,10 +1,13 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons'
 import Produtos from '../../components/Produtos';
 import { useNavigation } from '@react-navigation/native'
+import { CartContext } from '../../context/CartContext';
 
 export default function Home() {
+    const { cart, addItemCarrinho } = useContext(CartContext);
+
     const navigation = useNavigation();
     const [produtos, setprodutos] = useState([
         {
@@ -33,6 +36,11 @@ export default function Home() {
             price: 6.00
         },
     ])
+
+    function handleAddCarrinho(item) {
+        addItemCarrinho(item)
+    }
+
     return (
         //SafeAreaView só aplica para o IOS, "quebradinho de tela"
         <SafeAreaView style={styles.container}>
@@ -44,7 +52,9 @@ export default function Home() {
                     onPress={() => navigation.navigate("Cart")}
                 >
                     <View style={styles.dot}>
-                        <Text style={styles.dotText}>9</Text>
+                        <Text style={styles.dotText}>
+                            {cart?.length}
+                        </Text>
                     </View>
                     <Feather name="shopping-cart" size={30} color="#000" />
                 </TouchableOpacity>
@@ -53,7 +63,8 @@ export default function Home() {
                 style={styles.list}
                 data={produtos}
                 keyExtractor={(item) => String(item.id)}//garantindo que o id sempre será String
-                renderItem={({ item }) => <Produtos data={item} />}
+                renderItem={({ item }) => <Produtos data={item} addCarrinho={() => handleAddCarrinho(item)}
+                />}
             />
 
         </SafeAreaView>
